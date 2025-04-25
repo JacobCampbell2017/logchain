@@ -3,7 +3,6 @@
 use chrono:: Local;
 use serde::{Deserialize, Serialize};
 use core::fmt;
-use std::fmt::Display;
 use std::fs::{File, OpenOptions};
 use std::fs;
 use std::path::PathBuf;
@@ -32,7 +31,7 @@ impl LogEntry {
 
 impl fmt::Display for LogEntry {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {}, {})", self.time, self.message, self.tags.to_string())
+        write!(f, "({}, {}, {:?})", self.time, self.message, self.tags)
     }
 }
 /// Struct for JSON array
@@ -51,10 +50,18 @@ impl Log {
     }
 
     pub fn init() -> Self {
-        let mut file = File::open(Local::now().format("%Y-%m-%d").to_string()).unwrap();
+        let mut file = File::open(get_log_file_path()).unwrap();
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
-        serde_json::from_str(&contents).unwrap()
+
+        if contents.is_empty() {
+            eprintln!("Empty file");
+            Self::new()
+        }
+        else {
+            Self::new()
+        }
+        // serde_json::from_str(&contents).unwrap()
     }
     pub fn add_log(&mut self, log: LogEntry) {
         self.logs.push(log);
@@ -63,7 +70,7 @@ impl Log {
     
 impl fmt::Display for Log {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {})", self.date, self.logs.to_string())
+        write!(f, "({}, {:?})", self.date, self.logs)
     }
 }
 
@@ -92,9 +99,9 @@ fn get_log_file_path() -> PathBuf {
 /// Appends log to daily log or creates new log file
 pub fn log_entries(log: Log) -> Result<(), std::io::Error> {
     let mut options = OpenOptions::new();
-    let file = options.create(true).truncate(true).open(get_log_file_path());
+    let file = options.create(true).write(true).truncate(true).open(get_log_file_path());
     let entry = serde_json::to_string(&log).unwrap();
     
     // append log to file
-    writeln!(file.unwrap(), "{}", entry)
+    writeln!(file.expect("file error?"), "{}", entry)
 }
