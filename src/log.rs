@@ -1,12 +1,12 @@
 // log.rs
 
-use chrono:: Local;
-use serde::{Deserialize, Serialize};
+use chrono::Local;
 use core::fmt;
-use std::fs::{File, OpenOptions};
+use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::PathBuf;
+use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
+use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LogEntry {
@@ -18,7 +18,7 @@ pub struct LogEntry {
 impl LogEntry {
     pub fn new(message: String) -> Self {
         Self {
-            time: Local::now().time().to_string(),
+            time: Local::now().time().format("%H:%M:%S").to_string(),
             message,
             tags: Vec::new(),
         }
@@ -56,24 +56,20 @@ impl Log {
 
         if contents.is_empty() {
             eprintln!("Empty file");
-            Self::new()
+            return Self::new();
         }
-        else {
-            Self::new()
-        }
-        // serde_json::from_str(&contents).unwrap()
+        serde_json::from_str(&contents).unwrap()
     }
     pub fn add_log(&mut self, log: LogEntry) {
         self.logs.push(log);
     }
 }
-    
+
 impl fmt::Display for Log {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {:?})", self.date, self.logs)
     }
 }
-
 
 /// Returns a path like: <repo>/logs/YYYY-MM-DD.json
 fn get_log_file_path() -> PathBuf {
@@ -99,9 +95,14 @@ fn get_log_file_path() -> PathBuf {
 /// Appends log to daily log or creates new log file
 pub fn log_entries(log: Log) -> Result<(), std::io::Error> {
     let mut options = OpenOptions::new();
-    let file = options.create(true).write(true).truncate(true).open(get_log_file_path());
-    let entry = serde_json::to_string(&log).unwrap();
-    
+    let file = options
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(get_log_file_path());
+    let entry =
+        serde_json::to_string(&log).expect("Failed to serialize log into JSON for writing to file");
+
     // append log to file
     writeln!(file.expect("file error?"), "{}", entry)
 }

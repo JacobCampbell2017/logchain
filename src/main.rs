@@ -1,9 +1,8 @@
-
 // main.rs
 mod log;
 
 use clap::{Parser, Subcommand};
-use log::{log_entries, LogEntry, Log};
+use log::{Log, LogEntry, log_entries};
 
 /// CLI logbook for timestamped notes and tags
 #[derive(Parser)]
@@ -18,9 +17,7 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Add a new log entry
-    New {
-        message: String,
-    },
+    New { message: String },
 
     /// List today's logs
     List,
@@ -54,4 +51,3 @@ fn main() {
         }
     }
 }
-
