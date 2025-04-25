@@ -3,7 +3,7 @@
 mod log;
 
 use clap::{Parser, Subcommand};
-use log::{get_log_file_path, LogEntry};
+use log::{log_entry, LogEntry};
 
 /// CLI logbook for timestamped notes and tags
 #[derive(Parser)]
@@ -35,11 +35,10 @@ enum Commands {
 fn main() {
     let cli = Cli::parse();
     
-    let path = get_log_file_path();
-
     match cli.command {
         Commands::New { message } => {
             let entry = LogEntry::new(message);
+            log_entry(entry).expect("Error adding log");
         }
 
         Commands::List => {

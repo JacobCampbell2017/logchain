@@ -2,14 +2,17 @@
 
 use chrono:: {DateTime, Local};
 use serde::{Deserialize, Serialize};
-use std::fs::File;
-use std::path::{PathBuf};
+use serde_json::json;
+use std::fs::OpenOptions;
+use std::fs;
+use std::path::PathBuf;
+use std::io::Write;
 
 
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LogEntry {
-    pub timestamp: DateTime<Local>,
+    pub time: String,
     pub message: String,
     pub tags: Vec<String>,
 }
@@ -17,7 +20,7 @@ pub struct LogEntry {
 impl LogEntry {
     pub fn new(message: String) -> Self {
         Self {
-            timestamp: Local::now(),
+            time: Local::now().time().to_string(),
             message,
             tags: Vec::new(),
         }
@@ -28,15 +31,38 @@ impl LogEntry {
     }
 }
 
+/// Struct for JSON array
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Log {
+    pub date: String,
+    pub logs: Vec<LogEntry>,
+    pub num: u16,
+}
+
+impl Log {
+    pub fn new() -> Self {
+        Self {
+            date: Local::now().date_naive().to_string(),
+            logs: Vec::new(),
+            num: 0,
+        }
+    }
+    pub fn add_log(&mut self, log: LogEntry) {
+        self.logs.push(log);
+        self.num = self.logs.len() as u16;
+    }
+}
+
 /// Returns a path like: <repo>/logs/YYYY-MM-DD.json
-pub fn get_log_file_path() -> PathBuf {
+fn get_log_file_path() -> PathBuf {
     // Get the path to the binary
     let exe_path = std::env::current_exe().expect("Failed to get binary path");
 
     // Go to parent directory (likely /target/debug/)
     let base_dir = exe_path
         .parent()
-        .and_then(|p| p.parent()) // go up one more level to the project root
+        .and_then(|p| p.parent())
+        .and_then(|p| p.parent())
         .expect("Failed to find project root");
 
     // Append or create logs directory
@@ -45,8 +71,16 @@ pub fn get_log_file_path() -> PathBuf {
 
     // today's filename
     let date_str = Local::now().format("%Y-%m-%d").to_string();
-    let file_path = logs_dir.join(format!("{}.json", date_str));
-
-    file_path
+    logs_dir.join(format!("{}.json", date_str))
 }
 
+/// Appends log to daily log or creates new log file
+pub fn log_entry(message: LogEntry) -> Result<(), std::io::Error> {
+    let mut options = OpenOptions::new();
+    let file = options.create(true).append(true).open(get_log_file_path());
+    let entry = json!(message);
+    
+    // append log to file
+    writeln!(file.unwrap(), "{}", entry)
+
+}
