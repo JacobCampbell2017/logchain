@@ -1,14 +1,13 @@
 // log.rs
 
-use chrono:: {DateTime, Local};
+use chrono:: Local;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
-use std::fs::OpenOptions;
+use core::fmt;
+use std::fmt::Display;
+use std::fs::{File, OpenOptions};
 use std::fs;
 use std::path::PathBuf;
-use std::io::Write;
-
-
+use std::io::{Read, Write};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LogEntry {
@@ -31,12 +30,16 @@ impl LogEntry {
     }
 }
 
+impl fmt::Display for LogEntry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {}, {})", self.time, self.message, self.tags.to_string())
+    }
+}
 /// Struct for JSON array
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Log {
     pub date: String,
     pub logs: Vec<LogEntry>,
-    pub num: u16,
 }
 
 impl Log {
@@ -44,14 +47,26 @@ impl Log {
         Self {
             date: Local::now().date_naive().to_string(),
             logs: Vec::new(),
-            num: 0,
         }
+    }
+
+    pub fn init() -> Self {
+        let mut file = File::open(Local::now().format("%Y-%m-%d").to_string()).unwrap();
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).unwrap();
+        serde_json::from_str(&contents).unwrap()
     }
     pub fn add_log(&mut self, log: LogEntry) {
         self.logs.push(log);
-        self.num = self.logs.len() as u16;
     }
 }
+    
+impl fmt::Display for Log {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.date, self.logs.to_string())
+    }
+}
+
 
 /// Returns a path like: <repo>/logs/YYYY-MM-DD.json
 fn get_log_file_path() -> PathBuf {
@@ -75,12 +90,11 @@ fn get_log_file_path() -> PathBuf {
 }
 
 /// Appends log to daily log or creates new log file
-pub fn log_entry(message: LogEntry) -> Result<(), std::io::Error> {
+pub fn log_entries(log: Log) -> Result<(), std::io::Error> {
     let mut options = OpenOptions::new();
-    let file = options.create(true).append(true).open(get_log_file_path());
-    let entry = json!(message);
+    let file = options.create(true).truncate(true).open(get_log_file_path());
+    let entry = serde_json::to_string(&log).unwrap();
     
     // append log to file
     writeln!(file.unwrap(), "{}", entry)
-
 }
