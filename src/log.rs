@@ -55,7 +55,6 @@ impl Log {
     }
 
     pub fn init() -> Self {
-
         let path = get_log_file_path();
         if !path.exists() {
             Self::new()
@@ -73,16 +72,17 @@ impl Log {
     /// Displays Log of the day
     pub fn display_logs(&self) {
         let base_dir = get_base_path();
-        let width = term_size::dimensions()
-            .map(|(w, _)| w) 
-            .unwrap_or(80);
+        let width = term_size::dimensions().map(|(w, _)| w).unwrap_or(80);
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
-        println!("Daily log for {}: {}", base_dir.display(), Local::now().format("%Y-%m-%d"));
+        println!(
+            "Daily log for {}: {}",
+            base_dir.display(),
+            Local::now().format("%Y-%m-%d")
+        );
         println!("{:-<1$}", "", width);
         for line in &self.logs {
             println!("{}", line);
         }
-        
     }
 }
 
@@ -92,7 +92,7 @@ impl fmt::Display for Log {
     }
 }
 
-/// Returns a path like: <repo>/logs/YYYY-MM-DD.json
+/// Returns a PathBuf like: <repo>/logs/YYYY-MM-DD.json
 fn get_log_file_path() -> PathBuf {
     // Get the path to the binary
     let base_dir = get_base_path();
@@ -106,11 +106,12 @@ fn get_log_file_path() -> PathBuf {
     logs_dir.join(format!("{}.json", date_str))
 }
 
+/// Returns PathBuf of parent Repo (Currently from the binary)
 fn get_base_path() -> PathBuf {
     // Get the path to the binary
     let exe_path = std::env::current_exe().expect("Failed to get binary path");
 
-    // Go to parent directory (likely /target/debug/)
+    // Go to parent directory
     let base_dir = exe_path
         .parent()
         .and_then(|p| p.parent())
