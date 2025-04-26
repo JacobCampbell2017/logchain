@@ -32,7 +32,7 @@ enum Commands {
 fn main() {
     let cli = Cli::parse();
     let mut logs = Log::init();
-    println!("{}", logs);
+
     match cli.command {
         Commands::New { message } => {
             let entry = LogEntry::new(message);
@@ -41,8 +41,7 @@ fn main() {
         }
 
         Commands::List => {
-            println!("Listing today's logs");
-            // Next step: read from file and show
+            logs.display_logs();
         }
 
         Commands::Tag { tags } => {
