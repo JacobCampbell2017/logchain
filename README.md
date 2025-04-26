@@ -1,6 +1,6 @@
 # logchain
 
-A personal CLI logbook — My deployment project to past time (I wish I had started it earlier), learn a bit of rust, and refresh programming/computer science fundamentals. This project is focused on practical skill-building, not just following tutorials — using real project structure, data handling, and eventually expanding toward backend and cloud deployment. I am finding that Rust is an amazing language to use and learn.
+A personal CLI logbook — My deployment project to pass time (I wish I had started it earlier), learn a bit of rust, and refresh programming/computer science fundamentals. This project is focused on practical skill-building, not just following tutorials — using real project structure, data handling, and eventually expanding toward backend and cloud deployment. I am finding that Rust is an amazing language to use and learn.
 
 **logchain** is a simple command-line tool designed to track daily notes, ideas, and progress.  
 It was created as a personal project to sharpen skills in:
