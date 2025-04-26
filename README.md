@@ -1,37 +1,17 @@
 # logchain
 
-A personal CLI logbook — built for development practice, learning, and tracking work.
-
----
-
-## What is logchain?
+A personal CLI logbook — My deployment project to past time (I wish I had started it earlier), learn a bit of rust, and refresh programming/computer science fundamentals. This project is focused on practical skill-building, not just following tutorials — using real project structure, data handling, and eventually expanding toward backend and cloud deployment. I am finding that Rust is an amazing language to use and learn.
 
 **logchain** is a simple command-line tool designed to track daily notes, ideas, and progress.  
 It was created as a personal project to sharpen skills in:
 
 - Building a realistic CLI application
 - Handling file I/O, JSON serialization, and project structure in Rust
-- Laying the foundation for more advanced topics like server deployment and cloud integration
+- Future goal of adding server implementation to get better experience preparing for cloud deployment.
 
-The tool is fully usable locally, but part of the goal while building it was to also explore deployment considerations — thinking about how real-world software might evolve from a local tool into a networked service.
+## What it does
 
----
-
-## Why Build It?
-
-Learn Rust and make use of my time while I am deployed with the Military. This is a project I wanted to be passionate about and spend extra time refreshing my practice.
-I wanted a project that:
-
-- Reinforces my understanding of Rust by using it in a realistic setting
-- Practices working through the full development lifecycle: MVP → iteration → polish
-- Allows space to grow into backend development and cloud deployment
-- Results in something practical that I could actually use personally across different projects
-
-Rather than just following tutorials, logchain is the result of working through design, problem solving, and refactoring based on real use cases.
-
----
-
-## How It Works (MVP)
+**_This is the intended end state with logchain as a CLI tool_**
 
 | Command                  | Description                 |
 | :----------------------- | :-------------------------- |
@@ -40,14 +20,20 @@ Rather than just following tutorials, logchain is the result of working through 
 
 Logs are automatically saved into a `logs/` directory as JSON files organized by date.
 
-Example log structure:
+### Current Build Examples
+
+```bash
+$ cargo run -- new "Started CLI project"
+```
+
+Creates a log file like
 
 ```json
 {
-  "date": "2025-04-25",
+  "date": "2025-04-26",
   "logs": [
     {
-      "time": "08:50",
+      "time": "08:50:16",
       "message": "Started CLI project",
       "tags": []
     }
@@ -55,16 +41,11 @@ Example log structure:
 }
 ```
 
----
+To view logs:
 
-## Future Plans
-
-- Add support for tagging and filtering log entries
-- Build a basic terminal UI (TUI) interface for browsing and searching
-- Implement optional remote server sync and authentication
-- Explore Dockerization and deploying a small API backend
-- Continue improving usability, configuration, and portability
-
-This project is intentionally left open-ended to encourage continuous learning and feature exploration.
-
----
+```bash
+$ cargo run -- list
+Daily log for <C:\Example\Repo>: 2025-04-26
+------------------------------------------------------------------------------------------------------------------------
+[08:50:16] Started CLI project
+```
