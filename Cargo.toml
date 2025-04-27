@@ -2,6 +2,9 @@
 name = "logchain"
 version = "0.1.0"
 edition = "2024"
+description = "Offline-first CLI logbook. Track daily notes, commits, and progress easily."
+authors = ["Jacob Campbell <jacobrcampbell20@gmail.com>"]
+license = "Apache-2.0"
 
 [dependencies]
 clap = { version = "4.5.37", features = ["derive"] }

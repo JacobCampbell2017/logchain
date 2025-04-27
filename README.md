@@ -23,7 +23,7 @@ Logs are automatically saved into a `logs/` directory as JSON files organized by
 ### Current Build Examples
 
 ```bash
-$ cargo run -- new "Started CLI project"
+cargo run -- new "Started CLI project"
 ```
 
 Creates a log file like
@@ -41,11 +41,17 @@ Creates a log file like
 }
 ```
 
+To add a tag to the last entry:
+
+```bash
+cargo run -- tag "Tool"
+```
+
 To view logs:
 
 ```bash
 $ cargo run -- list
 Daily log for <C:\Example\Repo>: 2025-04-26
 ------------------------------------------------------------------------------------------------------------------------
-[08:50:16] Started CLI project
+[08:50:16] Started CLI project ["Feature"]
 ```

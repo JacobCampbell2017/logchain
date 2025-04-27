@@ -1,17 +1,20 @@
 // main.rs
 mod log;
 
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, command};
 use log::{Log, LogEntry, log_entries};
 
 /// CLI logbook for timestamped notes and tags
 #[derive(Parser)]
-#[command(name = "logchain")]
-#[command(version = "0.1")]
-#[command(about = "A personal CLI logbook for tracking work and notes", long_about = None)]
+#[command(
+    name = env!("CARGO_PKG_NAME"),
+    version = env!("CARGO_PKG_VERSION"),
+    about = env!("CARGO_PKG_DESCRIPTION"),
+    long_about = None,
+)]
 struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 
 #[derive(Subcommand)]
@@ -33,20 +36,28 @@ fn main() {
     let cli = Cli::parse();
     let mut logs = Log::init();
 
-    match cli.command {
-        Commands::New { message } => {
-            let entry = LogEntry::new(message);
+    match &cli.command {
+        Some(Commands::New { message }) => {
+            let entry = LogEntry::new(message.clone());
             logs.add_log(entry);
             log_entries(logs).expect("Error adding log");
         }
 
-        Commands::List => {
+        Some(Commands::List) => {
             logs.display_logs();
         }
 
-        Commands::Tag { tags } => {
+        Some(Commands::Tag { tags }) => {
             println!("Tagging last entry with: {:?}", tags);
-            // Next step: load last entry, update tags
+            logs.add_tags(tags.clone());
+            log_entries(logs).expect("Error adding tag(s)");
+        }
+
+        None => {
+            println!("Logchain version {}", env!("CARGO_PKG_VERSION"));
+            println!("Author: Jacob Campbell - Jacobrcampbell20@gmail.com");
+            println!("Offline-first CLI logbook. Track daily notes, commits, and progress easily.\n");
+            println!("[logchain --help] for commands")
         }
     }
 }

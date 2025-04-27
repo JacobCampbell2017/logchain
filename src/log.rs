@@ -3,11 +3,10 @@
 use chrono::Local;
 use core::fmt;
 use serde::{Deserialize, Serialize};
-use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::PathBuf;
-use term_size;
+use std::{env, fs};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LogEntry {
@@ -69,14 +68,26 @@ impl Log {
         self.logs.push(log);
     }
 
+    pub fn add_tags(&mut self, tags: Vec<String>) {
+        if let Some(last) = self.logs.last_mut() {
+            last.add_tag(tags);
+        } else {
+            println!("[warn] No log entries yet — cannot add tags.");
+        }
+    }
+
     /// Displays Log of the day
     pub fn display_logs(&self) {
         let base_dir = get_base_path();
         let width = term_size::dimensions().map(|(w, _)| w).unwrap_or(80);
+        let current_dir = base_dir
+            .file_name()
+            .and_then(|os_str| os_str.to_str())
+            .unwrap_or("logchain");
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
         println!(
             "Daily log for {}: {}",
-            base_dir.display(),
+            current_dir,
             Local::now().format("%Y-%m-%d")
         );
         println!("{:-<1$}", "", width);
@@ -106,18 +117,11 @@ fn get_log_file_path() -> PathBuf {
     logs_dir.join(format!("{}.json", date_str))
 }
 
-/// Returns PathBuf of parent Repo (Currently from the binary)
+/// Returns PathBuf of parent Repo
 fn get_base_path() -> PathBuf {
-    // Get the path to the binary
-    let exe_path = std::env::current_exe().expect("Failed to get binary path");
-
-    // Go to parent directory
-    let base_dir = exe_path
-        .parent()
-        .and_then(|p| p.parent())
-        .and_then(|p| p.parent())
-        .expect("Failed to find project root");
-    base_dir.to_path_buf()
+    env::current_dir()
+        .expect("Failed to get current directory")
+        .join("logchain")
 }
 
 /// Appends log to daily log or creates new log file

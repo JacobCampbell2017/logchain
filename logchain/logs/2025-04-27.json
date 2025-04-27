@@ -1,0 +1,45 @@
+{
+  "date": "2025-04-27",
+  "logs": [
+    {
+      "time": "18:45:05",
+      "message": "Added ability to tag entries",
+      "tags": ["Feature", "Test"]
+    },
+    {
+      "time": "19:21:15",
+      "message": "Logs rewrite to file after adding tags",
+      "tags": ["Fix"]
+    },
+    {
+      "time": "19:51:22",
+      "message": "Changed logs path to OS friendly directory",
+      "tags": ["Update", "System"]
+    },
+    {
+      "time": "20:34:30",
+      "message": "Changed to keep logchain folder local to project",
+      "tags": ["Fix"]
+    },
+    {
+      "time": "20:43:46",
+      "message": "Changed to display directory name when calling \"list\"",
+      "tags": ["Update"]
+    },
+    {
+      "time": "21:03:07",
+      "message": "Added default information if no arguments given",
+      "tags": []
+    },
+    {
+      "time": "21:10:59",
+      "message": "Changed package variables to auto update with cargo.toml",
+      "tags": []
+    },
+    {
+      "time": "21:13:55",
+      "message": "Built first release!",
+      "tags": ["Release"]
+    }
+  ]
+}
