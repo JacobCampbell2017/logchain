@@ -17,13 +17,14 @@ It was created as a personal project to sharpen skills in:
 | :----------------------- | :-------------------------- |
 | `logchain new "message"` | Create a new log entry      |
 | `logchain list`          | Display today's log entries |
+| `logchain tag "tag"`     | Add tag to newest log entry |
 
-Logs are automatically saved into a `logs/` directory as JSON files organized by date.
+A logchain folder is automatically created. In it will be the logs folder that will contain daily logs in json files.
 
 ### Current Build Examples
 
 ```bash
-cargo run -- new "Started CLI project"
+logchain new "Started CLI project"
 ```
 
 Creates a log file like
@@ -44,13 +45,13 @@ Creates a log file like
 To add a tag to the last entry:
 
 ```bash
-cargo run -- tag "Tool"
+logchain tag "Tool"
 ```
 
 To view logs:
 
 ```bash
-$ cargo run -- list
+$ logchain list
 Daily log for <C:\Example\Repo>: 2025-04-26
 ------------------------------------------------------------------------------------------------------------------------
 [08:50:16] Started CLI project ["Feature"]

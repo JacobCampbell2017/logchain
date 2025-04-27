@@ -64,10 +64,13 @@ impl Log {
             serde_json::from_str(&contents).unwrap()
         }
     }
+    
+    /// Push log to self.logs
     pub fn add_log(&mut self, log: LogEntry) {
         self.logs.push(log);
     }
 
+    /// Adds tags to last LogEntry in self.logs
     pub fn add_tags(&mut self, tags: Vec<String>) {
         if let Some(last) = self.logs.last_mut() {
             last.add_tag(tags);
