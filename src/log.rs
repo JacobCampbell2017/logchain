@@ -6,9 +6,10 @@ use serde::{Deserialize, Serialize};
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::PathBuf;
+use std::process::exit;
 use std::{env, fs};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LogEntry {
     pub time: String,
     pub message: String,
@@ -53,18 +54,25 @@ impl Log {
         }
     }
 
-    pub fn init() -> Self {
-        let path = get_log_file_path();
+    pub fn init(date: Option<String>) -> Self {
+        let path = get_log_file_path(date.clone());
         if !path.exists() {
-            Self::new()
+            match date {
+                Some(_) => {
+                    eprintln!("File for specified date does not exist. Ensure date is in YYYY-MM-DD format.");
+                    exit(1);
+                }
+                None => Self::new(),
+            }
         } else {
             let mut file = File::open(path).expect("Error opening file");
             let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
-            serde_json::from_str(&contents).unwrap()
+            file.read_to_string(&mut contents)
+                .expect("Error reading file");
+            serde_json::from_str(&contents).expect("Error parsing file")
         }
     }
-    
+
     /// Push log to self.logs
     pub fn add_log(&mut self, log: LogEntry) {
         self.logs.push(log);
@@ -88,11 +96,7 @@ impl Log {
             .and_then(|os_str| os_str.to_str())
             .unwrap_or("logchain");
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
-        println!(
-            "Daily log for {}: {}",
-            current_dir,
-            Local::now().format("%Y-%m-%d")
-        );
+        println!("Daily log for {}: {}", current_dir, self.date,);
         println!("{:-<1$}", "", width);
         for line in &self.logs {
             println!("{}", line);
@@ -107,34 +111,37 @@ impl fmt::Display for Log {
 }
 
 /// Returns a PathBuf like: <repo>/logs/YYYY-MM-DD.json
-fn get_log_file_path() -> PathBuf {
+fn get_log_file_path(date: Option<String>) -> PathBuf {
+    let date_str = match date {
+        Some(d) => d,
+        None => Local::now().format("%Y-%m-%d").to_string(),
+    };
+
     // Get the path to the binary
     let base_dir = get_base_path();
 
     // Append or create logs directory
-    let logs_dir = base_dir.join("logs");
+    let logs_dir = base_dir.join("logchain").join("logs");
     fs::create_dir_all(&logs_dir).expect("Failed to create logs directory");
 
     // today's filename
-    let date_str = Local::now().format("%Y-%m-%d").to_string();
+    // let date_str = Local::now().format("%Y-%m-%d").to_string();
     logs_dir.join(format!("{}.json", date_str))
 }
 
 /// Returns PathBuf of parent Repo
 fn get_base_path() -> PathBuf {
-    env::current_dir()
-        .expect("Failed to get current directory")
-        .join("logchain")
+    env::current_dir().expect("Failed to get current directory")
 }
 
 /// Appends log to daily log or creates new log file
-pub fn log_entries(log: Log) -> Result<(), std::io::Error> {
+pub fn log_entries(log: Log, date: Option<String>) -> Result<(), std::io::Error> {
     let mut options = OpenOptions::new();
     let file = options
         .create(true)
         .write(true)
         .truncate(true)
-        .open(get_log_file_path());
+        .open(get_log_file_path(date));
     let entry =
         serde_json::to_string(&log).expect("Failed to serialize log into JSON for writing to file");
 

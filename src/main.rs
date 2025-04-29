@@ -1,62 +1,45 @@
 // main.rs
+mod cli_parse;
 mod log;
 
-use clap::{Parser, Subcommand, command};
+use cli_parse::Commands;
 use log::{Log, LogEntry, log_entries};
 
-/// CLI logbook for timestamped notes and tags
-#[derive(Parser)]
-#[command(
-    name = env!("CARGO_PKG_NAME"),
-    version = env!("CARGO_PKG_VERSION"),
-    about = env!("CARGO_PKG_DESCRIPTION"),
-    long_about = None,
-)]
-struct Cli {
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
-
-#[derive(Subcommand)]
-enum Commands {
-    /// Add a new log entry
-    New { message: String },
-
-    /// List today's logs
-    List,
-
-    /// Add tags to the latest log
-    Tag {
-        /// One or more tags
-        tags: Vec<String>,
-    },
-}
-
 fn main() {
-    let cli = Cli::parse();
-    let mut logs = Log::init();
+    // Args
+
+    let cli = cli_parse::parse();
+    let mut logs = Log::init(None);
 
     match &cli.command {
         Some(Commands::New { message }) => {
             let entry = LogEntry::new(message.clone());
-            logs.add_log(entry);
-            log_entries(logs).expect("Error adding log");
+            logs.add_log(entry.clone());
+            log_entries(logs, None).expect("Error adding log");
+            println!("New log added: {}", entry);
         }
 
-        Some(Commands::List) => {
-            logs.display_logs();
-        }
+        Some(Commands::List { date }) => match date {
+            Some(_) => {
+                Log::init(date.clone()).display_logs();
+            }
+            None => logs.display_logs(),
+        },
 
         Some(Commands::Tag { tags }) => {
             println!("Tagging last entry with: {:?}", tags);
             logs.add_tags(tags.clone());
-            log_entries(logs).expect("Error adding tag(s)");
+            log_entries(logs, None).expect("Error adding tag(s)");
         }
 
         None => {
-            println!("Logchain version {}", env!("CARGO_PKG_VERSION"));
-            println!("Author: Jacob Campbell - Jacobrcampbell20@gmail.com");
-            println!("Offline-first CLI logbook. Track daily notes, commits, and progress easily.\n");
+            println!(
+                "{} version {}",
+                env!("CARGO_PKG_NAME"),
+                env!("CARGO_PKG_VERSION")
+            );
+            println!("{}", env!("CARGO_PKG_AUTHORS"));
+            println!("{}\n", env!("CARGO_PKG_DESCRIPTION"));
             println!("[logchain --help] for commands")
         }
     }
