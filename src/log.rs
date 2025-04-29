@@ -1,5 +1,4 @@
 /// log.rs
-
 use chrono::Local;
 use core::fmt;
 use serde::{Deserialize, Serialize};
@@ -65,7 +64,9 @@ impl Log {
             match date {
                 Some(_) => {
                     // FILE does not exist
-                    eprintln!("File for specified date does not exist. Ensure date is in YYYY-MM-DD format.");
+                    eprintln!(
+                        "File for specified date does not exist. Ensure date is in YYYY-MM-DD format."
+                    );
                     exit(1);
                 }
                 // Create new log file for today
@@ -92,6 +93,10 @@ impl Log {
         } else {
             println!("[warn] No log entries yet — cannot add tags.");
         }
+    }
+
+    pub fn remove_log(&mut self) {
+        self.logs.pop();
     }
 
     /// Displays all LogEntry in self.logs formatted to terminal

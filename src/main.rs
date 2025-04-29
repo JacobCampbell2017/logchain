@@ -12,13 +12,22 @@ fn main() {
     let mut logs = Log::init(None);
 
     match &cli.command {
-        Some(Commands::New { message }) => {
+        Some(Commands::New { message, tags }) => {
             let entry = LogEntry::new(message.clone());
             logs.add_log(entry.clone());
+
+            if !tags.is_none() {
+                logs.add_tags(tags.clone().expect("Error adding tags"));
+            }
+
             log_entries(logs, None).expect("Error adding log");
             println!("New log added: {}", entry);
         }
 
+        Some(Commands::Remove) => {
+            logs.remove_log();
+            log_entries(logs, None).expect("Error removing latest log");
+        }
         Some(Commands::List { date }) => match date {
             Some(_) => {
                 Log::init(date.clone()).display_logs();

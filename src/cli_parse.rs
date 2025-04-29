@@ -1,5 +1,4 @@
 /// cli.rs
-
 use clap::{Parser, Subcommand, command};
 
 /// CLI logbook for timestamped notes and tags
@@ -18,7 +17,20 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     /// Add a new log entry
-    New { message: String },
+    New {
+        message: String,
+        #[arg(
+            short = 't',
+            long = "tag",
+            value_name = "TAG",
+            help = "Tag the log entry. Tags seperated by commas.",
+            value_delimiter = ','
+        )]
+        tags: Option<Vec<String>>,
+    },
+
+    /// Remove latest log entry
+    Remove,
 
     /// List logs of specificied date.
     List {
@@ -31,9 +43,10 @@ pub enum Commands {
         date: Option<String>,
     },
 
-    /// Add tags to the latest log
+    /// Add tags to the latest log entry
     Tag {
         /// One or more tags
+        #[arg(value_delimiter = ',')]
         tags: Vec<String>,
     },
 }
