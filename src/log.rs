@@ -1,4 +1,4 @@
-// log.rs
+/// log.rs
 
 use chrono::Local;
 use core::fmt;
@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use std::process::exit;
 use std::{env, fs};
 
+/// Timestamped Log Entry
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LogEntry {
     pub time: String,
@@ -39,14 +40,17 @@ impl fmt::Display for LogEntry {
         }
     }
 }
-/// Struct for JSON array
+/// Struct for Log
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Log {
+    /// Date in YYYY-MM-DD format
     pub date: String,
+    /// Vector of LogEntry's
     pub logs: Vec<LogEntry>,
 }
 
 impl Log {
+    /// Constructor that sets time to current date
     pub fn new() -> Self {
         Self {
             date: Local::now().date_naive().to_string(),
@@ -54,14 +58,17 @@ impl Log {
         }
     }
 
+    /// Can use date as optional perameter for creating Log from past dates
     pub fn init(date: Option<String>) -> Self {
         let path = get_log_file_path(date.clone());
         if !path.exists() {
             match date {
                 Some(_) => {
+                    // FILE does not exist
                     eprintln!("File for specified date does not exist. Ensure date is in YYYY-MM-DD format.");
                     exit(1);
                 }
+                // Create new log file for today
                 None => Self::new(),
             }
         } else {
@@ -87,7 +94,7 @@ impl Log {
         }
     }
 
-    /// Displays Log of the day
+    /// Displays all LogEntry in self.logs formatted to terminal
     pub fn display_logs(&self) {
         let base_dir = get_base_path();
         let width = term_size::dimensions().map(|(w, _)| w).unwrap_or(80);
@@ -110,7 +117,7 @@ impl fmt::Display for Log {
     }
 }
 
-/// Returns a PathBuf like: <repo>/logs/YYYY-MM-DD.json
+/// Returns a PathBuf like: repo/logchain/logs/YYYY-MM-DD.json
 fn get_log_file_path(date: Option<String>) -> PathBuf {
     let date_str = match date {
         Some(d) => d,
