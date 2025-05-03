@@ -45,7 +45,7 @@ Creates a log file like
 To add a tag to the last entry:
 
 ```bash
-logchain tag "Tool"
+logchain tag "Feature"
 ```
 
 To view logs:
