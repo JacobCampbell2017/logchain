@@ -1,5 +1,6 @@
 // main.rs
 mod cli_parse;
+mod config;
 mod log;
 
 use cli_parse::Commands;
@@ -12,6 +13,10 @@ fn main() {
     let mut logs = Log::init(None);
 
     match &cli.command {
+        Some(Commands::Config) => {
+            let config = config::set_config();
+            println!("{:?}", config);
+        }
         Some(Commands::New { message, tags }) => {
             let entry = LogEntry::new(message.clone());
             logs.add_log(entry.clone());

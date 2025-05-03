@@ -142,7 +142,7 @@ fn get_log_file_path(date: Option<String>) -> PathBuf {
 }
 
 /// Returns PathBuf of parent Repo
-fn get_base_path() -> PathBuf {
+pub fn get_base_path() -> PathBuf {
     env::current_dir().expect("Failed to get current directory")
 }
 

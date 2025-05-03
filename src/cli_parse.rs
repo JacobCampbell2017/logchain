@@ -16,6 +16,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    Config,
     /// Add a new log entry
     New {
         message: String,
