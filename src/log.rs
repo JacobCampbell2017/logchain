@@ -106,7 +106,7 @@ impl Log {
         let current_dir = base_dir
             .file_name()
             .and_then(|os_str| os_str.to_str())
-            .unwrap_or("logchain");
+            .unwrap_or(".logchain");
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
         println!("Daily log for {}: {}", current_dir, self.date,);
         println!("{:-<1$}", "", width);
@@ -133,7 +133,7 @@ fn get_log_file_path(date: Option<String>) -> PathBuf {
     let base_dir = get_base_path();
 
     // Append or create logs directory
-    let logs_dir = base_dir.join("logchain").join("logs");
+    let logs_dir = base_dir.join(".logchain").join("logs");
     fs::create_dir_all(&logs_dir).expect("Failed to create logs directory");
 
     // today's filename

@@ -13,18 +13,22 @@ fn main() {
     let mut logs = Log::init(None);
 
     match &cli.command {
-        Some(Commands::Config) => {
+        Some(Commands::Config {
+            user_name,
+            user_email,
+        }) => {
             let config = config::set_config();
+            config::modify_config(vec![user_name.clone(), user_email.clone()]);
             println!("{:?}", config);
         }
         Some(Commands::New { message, tags }) => {
-            let entry = LogEntry::new(message.clone());
+            let mut entry = LogEntry::new(message.clone());
             logs.add_log(entry.clone());
 
             if !tags.is_none() {
                 logs.add_tags(tags.clone().expect("Error adding tags"));
+                entry = logs.logs.last().unwrap().clone();
             }
-
             log_entries(logs, None).expect("Error adding log");
             println!("New log added: {}", entry);
         }

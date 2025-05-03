@@ -16,7 +16,23 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    Config,
+    /// Modify config.toml
+    Config {
+        #[arg(
+            short = 'u',
+            long = "user.name",
+            value_name = "USER_NAME",
+            help = "Adds name to log Entry's - Future use for collaboritive logs"
+        )]
+        user_name: String,
+        #[arg(
+            short = 'e',
+            long = "user.email",
+            value_name = "EMAIL",
+            help = "Adds email to log Entry's - Future use for collaboritive logs"
+        )]
+        user_email: String,
+    },
     /// Add a new log entry
     New {
         message: String,
